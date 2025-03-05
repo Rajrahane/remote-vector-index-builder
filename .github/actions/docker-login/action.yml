@@ -1,0 +1,33 @@
+name: Docker Login Steps
+description: Logs into DockerHub with AWS Secrets Manager
+
+inputs:
+  MIGRATIONS_DOCKER_USERNAME:
+    description: DockerHub Username
+    required: true
+  MIGRATIONS_DOCKER_ROLE:
+    description: DockerHub AWS Role to assume
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.MIGRATIONS_DOCKER_ROLE }}
+        aws-region: us-east-1
+  
+    - name: Retrieve Values
+      id: retrieve-values
+      run: |
+        DOCKERHUB_PASSWORD=`aws secretsmanager get-secret-value --secret-id jenkins-staging-dockerhub-credential --query SecretString --output text`
+        echo "::add-mask::$DOCKERHUB_PASSWORD"
+        echo "dockerhub-password=$DOCKERHUB_PASSWORD" >> $GITHUB_OUTPUT
+    
+    # https://github.com/docker/login-action
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.MIGRATIONS_DOCKER_USERNAME }}
+        password: ${{ steps.retrieve-values.outputs.dockerhub-password }}

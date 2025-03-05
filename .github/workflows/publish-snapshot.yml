@@ -1,0 +1,40 @@
+name: Build and Publish Remote-Vector-Index-Builder Snapshot
+
+on:
+  push:
+    branches:
+      - main
+      - github-ci
+    paths:  # Note this is done for folder specific checkouts, reduce CI memory load
+      - 'remote-vector-index-builder/**'
+      - '.github/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish-snapshot:
+    name: Build and Publish Remote-Vector-Index-Builder Snaphot Image
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout?tab=readme-ov-file#usage
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Note this is done for folder specific checkouts, reduce CI memory load
+          sparse-checkout: |
+            .github/CODEOWNERS
+            .github/actions
+            remote-vector-index-builder
+      
+      - name: Login to Dockerhub
+        uses: ./.github/actions/docker-login
+        with:
+          MIGRATIONS_DOCKER_ROLE: ${{ secrets.MIGRATIONS_DOCKER_ROLE }}
+          MIGRATIONS_DOCKER_USERNAME: ${{ secrets.MIGRATIONS_DOCKER_USERNAME }}
+
+      # Standard Step
+      - name: Logout to DockerHub
+        if: always()
+        run: docker logout
