@@ -13,4 +13,5 @@ class FaissGPUIndexType(Enum):
     Use this enum to switch the type of FAISS GPU Index to build
     in the FaissIndexBuildService
     """
+
     CAGRA = "CAGRA"
