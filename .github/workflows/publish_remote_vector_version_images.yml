@@ -37,7 +37,7 @@ on:
             description: 'Remove latest/snapshot-tagged images after pushing'
             required: true
             type: boolean
-            default: false
+            default: true
 
 permissions:
   id-token: write
