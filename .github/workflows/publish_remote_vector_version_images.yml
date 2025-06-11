@@ -5,12 +5,12 @@ on:
       inputs:
         publish_latest:
             description: 'Publish latest tag'
-            required: true
+            required: false
             type: boolean
             default: true
         publish_version:
             description: 'Publish version tag'
-            required: true
+            required: false
             type: boolean
             default: true
         base_image_tag:
@@ -200,7 +200,7 @@ jobs:
           fi
           
           # Remove latest/snapshot-tagged images if flag is set
-          if [[ "${{ steps.cleanup-flags.outputs.remove_version_images }}" == "true" ]]; then
+          if [[ "${{ steps.cleanup-flags.outputs.remove_latest_images }}" == "true" ]]; then
             echo "Removing latest/snapshot-tagged images"
             remove_image "opensearchstaging/remote-vector-index-builder:${{ steps.image-tags.outputs.base_tag }}"
             remove_image "opensearchstaging/remote-vector-index-builder:${{ steps.image-tags.outputs.core_tag }}"
