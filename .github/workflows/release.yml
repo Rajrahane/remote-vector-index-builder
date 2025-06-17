@@ -29,8 +29,8 @@ jobs:
           with: 
             secret: ${{ github.TOKEN }}
             approvers: ${{ steps.get_approvers.outputs.approvers }}
-            minimum-approvals: 3
-            exclude-workflow-initiator-as-approver: false
+            minimum-approvals: 2
+            exclude-workflow-initiator-as-approver: true
             issue-title: 'Release Remote-Vector-Index-Builder Version v${{ github.event.inputs.version }} Images to opensearchproject '
             issue-body: >
                 Please approve or deny release of Remote-Vector-Index-Builder 

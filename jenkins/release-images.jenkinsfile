@@ -24,9 +24,9 @@ standardReleasePipelineWithGenericTrigger(
                         ]
             }
         }
-        copyDockerImage(`faiss-base-${TAG}`)
-        copyDockerImage(`core-${TAG}`)
-        copyDockerImage(`api-${TAG}`)
+        copyDockerImage("faiss-base-${TAG}")
+        copyDockerImage("core-${TAG}")
+        copyDockerImage("api-${TAG}")
         copyDockerImage("faiss-base-latest")
         copyDockerImage("core-latest")
         copyDockerImage("api-latest")
