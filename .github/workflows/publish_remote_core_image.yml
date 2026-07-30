@@ -18,6 +18,7 @@ on:
         required: true
       REMOTE_VECTOR_DOCKER_PASSWORD:
         required: true
+  workflow_dispatch:
 
 permissions:
   id-token: write
