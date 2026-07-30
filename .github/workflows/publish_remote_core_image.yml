@@ -2,8 +2,6 @@ name: Build and Publish Remote-Vector-Index-Builder Core Snapshot Image to Docke
 
 on:
   push:
-    branches:
-      - main
     paths:
       - 'remote_vector_index_builder/core/**'
       - '.github/workflows/publish_remote_core_image.yml'
