@@ -12,7 +12,7 @@ on:
     secrets:
       REMOTE_VECTOR_DOCKER_USERNAME:
         required: true
-      REMOTE_VECTOR_DOCKER_ROLE:
+      REMOTE_VECTOR_DOCKER_PASSWORD:
         required: true
 
 permissions:
@@ -22,10 +22,7 @@ permissions:
 jobs:
   build-and-publish-core-image:
     name: Build and Publish Remote-Vector-Index-Builder Core Snapshot Image
-    if: github.repository == 'opensearch-project/remote-vector-index-builder'
-    runs-on:
-      group: selfhosted-gpu-runners
-      labels: g62xlarge
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -35,28 +32,15 @@ jobs:
         run : |
           docker build  -f ./remote_vector_index_builder/core/Dockerfile . -t opensearchstaging/remote-vector-index-builder:core-snapshot
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
-        with:
-          role-to-assume: ${{ secrets.REMOTE_VECTOR_DOCKER_ROLE }}
-          aws-region: us-east-1
-
-      - name: Retrieve Values
-        id: retrieve-values
-        run: |
-          DOCKERHUB_PASSWORD=`aws secretsmanager get-secret-value --secret-id jenkins-staging-dockerhub-credential --query SecretString --output text`
-          echo "::add-mask::$DOCKERHUB_PASSWORD"
-          echo "dockerhub-password=$DOCKERHUB_PASSWORD" >> $GITHUB_OUTPUT
-
       - name: Login to DockerHub
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ secrets.REMOTE_VECTOR_DOCKER_USERNAME }}
-          password: ${{ steps.retrieve-values.outputs.dockerhub-password }}
+          password: ${{ secrets.REMOTE_VECTOR_DOCKER_PASSWORD }}
 
       - name: Push Docker Image
         run : |
-          docker push opensearchstaging/remote-vector-index-builder:core-snapshot
+          docker push ${{secrets.REMOTE_VECTOR_DOCKER_USERNAME}}/remote-vector-index-builder:core-snapshot
       - name: Runner Cleanups
         if: always()
         uses: ./.github/actions/docker-cleanup
