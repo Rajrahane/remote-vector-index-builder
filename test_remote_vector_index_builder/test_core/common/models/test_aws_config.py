@@ -26,7 +26,7 @@ def test_create_resource_passes_arguments_correctly(mock_boto3_resource):
         aws_access_key_id="test-key",
         aws_secret_access_key="test-secret",
         aws_session_token="test-token",
-        boto_config_params={"max_pool_connections": 25, "read_timeout": 5}
+        boto_config_params={"max_pool_connections": 25, "read_timeout": 5},
     )
 
     resource = config.create_resource("dynamodb")

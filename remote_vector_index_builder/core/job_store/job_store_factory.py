@@ -10,7 +10,9 @@ from core.common.exceptions import UnsupportedJobStoreTypeError
 
 class JobStoreFactory:
     @staticmethod
-    def create_job_store(job_store_type: JobStoreType, config_dict: Optional[Dict[str, Any]] = None) -> JobStore:
+    def create_job_store(
+        job_store_type: JobStoreType, config_dict: Optional[Dict[str, Any]] = None
+    ) -> JobStore:
         config_dict = config_dict or {}
 
         if job_store_type == JobStoreType.InMemory:
