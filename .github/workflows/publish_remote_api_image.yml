@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker Image
         run : |
-          docker build  -f ./remote_vector_index_builder/app/Dockerfile . -t opensearchstaging/remote-vector-index-builder:api-snapshot
+          docker build  -f ./remote_vector_index_builder/app/Dockerfile . -t ${{secrets.REMOTE_VECTOR_DOCKER_USERNAME}}/remote-vector-index-builder:api-snapshot
 
       - name: Login to DockerHub
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
