@@ -34,3 +34,7 @@ class UnsupportedVectorsDataTypeError(ValueError):
     """Error raised when creating a Vector Dataset because of unsupported data type"""
 
     pass
+
+
+class UnsupportedJobStoreTypeError(ValueError):
+    pass
