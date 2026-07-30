@@ -19,7 +19,6 @@ jobs:
   run-tests:
     name: Run tests for Remote-Vector-Index-Builder
     runs-on: ubuntu-latest
-    if: github.repository == 'opensearch-project/remote-vector-index-builder'
 
     steps:
         # https://github.com/actions/checkout?tab=readme-ov-file#usage

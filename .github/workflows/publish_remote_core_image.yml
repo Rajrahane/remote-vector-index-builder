@@ -2,18 +2,23 @@ name: Build and Publish Remote-Vector-Index-Builder Core Snapshot Image to Docke
 
 on:
   push:
-    branches:
-      - main
     paths:
       - 'remote_vector_index_builder/core/**'
+      - '.github/workflows/publish_remote_core_image.yml'
+  pull_request:
+    paths: # Note this is done for folder specific checkouts, reduce CI memory load
+      - 'remote_vector_index_builder/**'
+      - 'test_remote_vector_index_builder/**'
+      - 'e2e/**'
       - '.github/workflows/publish_remote_core_image.yml'
 
   workflow_call: # enables workflow to be reused
     secrets:
       REMOTE_VECTOR_DOCKER_USERNAME:
         required: true
-      REMOTE_VECTOR_DOCKER_ROLE:
+      REMOTE_VECTOR_DOCKER_PASSWORD:
         required: true
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -22,10 +27,7 @@ permissions:
 jobs:
   build-and-publish-core-image:
     name: Build and Publish Remote-Vector-Index-Builder Core Snapshot Image
-    if: github.repository == 'opensearch-project/remote-vector-index-builder'
-    runs-on:
-      group: selfhosted-gpu-runners
-      labels: g62xlarge
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -33,30 +35,17 @@ jobs:
 
       - name: Build Docker Image
         run : |
-          docker build  -f ./remote_vector_index_builder/core/Dockerfile . -t opensearchstaging/remote-vector-index-builder:core-snapshot
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
-        with:
-          role-to-assume: ${{ secrets.REMOTE_VECTOR_DOCKER_ROLE }}
-          aws-region: us-east-1
-
-      - name: Retrieve Values
-        id: retrieve-values
-        run: |
-          DOCKERHUB_PASSWORD=`aws secretsmanager get-secret-value --secret-id jenkins-staging-dockerhub-credential --query SecretString --output text`
-          echo "::add-mask::$DOCKERHUB_PASSWORD"
-          echo "dockerhub-password=$DOCKERHUB_PASSWORD" >> $GITHUB_OUTPUT
+          docker build  -f ./remote_vector_index_builder/core/Dockerfile . -t ${{secrets.REMOTE_VECTOR_DOCKER_USERNAME}}/remote-vector-index-builder:core-snapshot
 
       - name: Login to DockerHub
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ secrets.REMOTE_VECTOR_DOCKER_USERNAME }}
-          password: ${{ steps.retrieve-values.outputs.dockerhub-password }}
+          password: ${{ secrets.REMOTE_VECTOR_DOCKER_PASSWORD }}
 
       - name: Push Docker Image
         run : |
-          docker push opensearchstaging/remote-vector-index-builder:core-snapshot
+          docker push ${{secrets.REMOTE_VECTOR_DOCKER_USERNAME}}/remote-vector-index-builder:core-snapshot
       - name: Runner Cleanups
         if: always()
         uses: ./.github/actions/docker-cleanup
@@ -68,5 +57,5 @@ jobs:
     needs: build-and-publish-core-image
     uses: ./.github/workflows/publish_remote_api_image.yml
     secrets:
-      REMOTE_VECTOR_DOCKER_ROLE: ${{ secrets.REMOTE_VECTOR_DOCKER_ROLE }}
       REMOTE_VECTOR_DOCKER_USERNAME: ${{ secrets.REMOTE_VECTOR_DOCKER_USERNAME }}
+      REMOTE_VECTOR_DOCKER_PASSWORD: ${{ secrets.REMOTE_VECTOR_DOCKER_PASSWORD }}
